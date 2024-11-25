@@ -11,6 +11,15 @@ socket.on("connect", () => {
 
 socket.on("matchFound", (data) => {
   console.log("User 2: Match found:", data);
+
+  // Simulate a move after matching (NEW CODE)
+  setTimeout(() => {
+    socket.emit("move", { gameId: data.gameId, from: "e7", to: "e5" });
+  }, 2000);
+});
+
+socket.on("move", (data) => {
+  console.log("User 2: Move received:", data); // NEW CODE
 });
 
 socket.on("disconnect", () => {

@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt"); // Import bcrypt for password hashing
 const pool = require("./db"); // Import database connection
 const connectedUsers = {}; // Store connected users and their sockets
 const matchmakingQueue = []; // Queue for users waiting for matchmaking
+const activeGames = {}; // Store active games (NEW CODE)
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -104,6 +105,14 @@ io.on("connection", (socket) => {
   const clientIp = socket.handshake.address;
   console.log(`WebSocket Connection from IP: ${clientIp}`);
 
+  // Function to create a new game (NEW CODE)
+  function createGame(player1, player2) {
+    const gameId = `${player1}-${player2}`;
+    activeGames[gameId] = { player1, player2, moves: [] };
+    console.log(`Game created: ${gameId}`);
+    return gameId;
+  }
+
   // Store the connected user
   socket.on("join", ({ userId }) => {
     connectedUsers[userId] = socket.id;
@@ -120,12 +129,15 @@ io.on("connection", (socket) => {
 
       console.log(`Matched ${player1.userId} with ${player2.userId}`);
 
-      // Notify both players about their match
+      // Create a game and notify players
+      const gameId = createGame(player1.userId, player2.userId); // NEW CODE
       io.to(player1.socketId).emit("matchFound", {
         opponentId: player2.userId,
+        gameId, // NEW CODE
       });
       io.to(player2.socketId).emit("matchFound", {
         opponentId: player1.userId,
+        gameId, // NEW CODE
       });
     }
   });
@@ -141,8 +153,18 @@ io.on("connection", (socket) => {
   socket.on("move", ({ gameId, from, to }) => {
     console.log(`Move received for game ${gameId}: ${from} -> ${to}`);
 
+    // Update game state (NEW CODE)
+    if (activeGames[gameId]) {
+      activeGames[gameId].moves.push({ from, to });
+    }
+
     // Broadcast the move to the opponent
-    const opponentSocketId = connectedUsers[gameId]; // Replace with actual opponent logic
+    const game = activeGames[gameId]; // NEW CODE
+    const opponentSocketId =
+      game && game.player1 === socket.id
+        ? connectedUsers[game.player2]
+        : connectedUsers[game.player1]; // Updated Logic
+
     if (opponentSocketId) {
       io.to(opponentSocketId).emit("move", { from, to });
     } else {

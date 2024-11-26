@@ -12,14 +12,14 @@ socket.on("connect", () => {
 socket.on("matchFound", (data) => {
   console.log("User 2: Match found:", data);
 
-  // Simulate a move after matching (NEW CODE)
-  setTimeout(() => {
-    socket.emit("move", { gameId: data.gameId, from: "e7", to: "e5" });
-  }, 2000);
-});
-
-socket.on("move", (data) => {
-  console.log("User 2: Move received:", data); // NEW CODE
+  // Respond with a move after receiving a move from the opponent
+  socket.on("move", (moveData) => {
+    console.log("User 2: Move received:", moveData);
+    setTimeout(() => {
+      console.log("User 2: Responding with move e7 -> e5");
+      socket.emit("move", { gameId: data.gameId, from: "e7", to: "e5" }); // Response move
+    }, 2000); // Delay for simulating gameplay
+  });
 });
 
 socket.on("disconnect", () => {

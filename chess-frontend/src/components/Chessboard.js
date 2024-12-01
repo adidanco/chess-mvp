@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Chessboard from "chessboardjsx";
-import { Chess } from "chess.js";
+import Chess from "chess.js";
 import socket from "../services/socket";
 
 const ChessboardComponent = ({ gameId, userId }) => {

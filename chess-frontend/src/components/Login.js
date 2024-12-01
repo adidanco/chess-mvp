@@ -9,9 +9,12 @@ const Login = ({ onLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("Submitting login/register request:", { username, password });
       const response = await axios.post("/register", { username, password });
+      console.log("Received response from server:", response.data);
       onLogin(response.data.userId); // Pass userId to the parent component
     } catch (err) {
+      console.error("Error occurred during registration:", err);  
       setError(err.response?.data || "Registration failed");
     }
   };

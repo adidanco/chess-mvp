@@ -13,7 +13,8 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // Allow requests from any origin
+    origin: "http://localhost:3000", // Allow requests from any origin
+    methods: ["GET", "POST"],
   },
   transports: ["websocket"], // Force WebSocket transport
   path: "/", // Change WebSocket path to root
@@ -68,6 +69,7 @@ app.post("/register", async (req, res) => {
     if (err.code === "23505") {
       res.status(409).send("Username already exists"); // Handle unique constraint violation
     } else {
+      console.error(err);
       res.status(500).send("Server error");
     }
   }

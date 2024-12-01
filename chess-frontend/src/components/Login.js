@@ -14,8 +14,8 @@ const Login = ({ onLogin }) => {
       console.log("Received response from server:", response.data);
       onLogin(response.data.userId); // Pass userId to the parent component
     } catch (err) {
-      console.error("Error occurred during registration:", err);  
-      setError(err.response?.data || "Registration failed");
+        const errorMessage = err.response?.data?.message || "Registration failed";
+        setError(errorMessage);
     }
   };
 

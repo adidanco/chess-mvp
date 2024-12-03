@@ -33,7 +33,7 @@ console.log("Initial State: connectedUsers =", connectedUsers);
 console.log("Initial State: matchmakingQueue =", matchmakingQueue);
 console.log("Initial State: disconnectedUsers =", disconnectedUsers);
 
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:3000', methods: ['GET', 'POST'] }));
 app.use(express.json());
 
 // Basic API Endpoint

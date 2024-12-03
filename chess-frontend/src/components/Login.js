@@ -12,7 +12,12 @@ const Login = ({ onLogin }) => {
       console.log("Submitting login/register request:", { username, password });
       const response = await axios.post("/register", { username, password });
       console.log("Received response from server:", response.data);
-      onLogin(response.data.userId); // Pass userId to the parent component
+      // Pass userId to the parent component
+      if (response.data?.userId) {
+        onLogin(response.data.userId);
+      } else {
+        setError('Invalid response from server');
+      } 
     } catch (err) {
         const errorMessage = err.response?.data?.message || "Registration failed";
         setError(errorMessage);

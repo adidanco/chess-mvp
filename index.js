@@ -3,6 +3,7 @@ const express = require("express");
 const { Server } = require("socket.io");
 const http = require("http");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt"); // Import bcrypt for password hashing
 const pool = require("./db"); // Import database connection
 const connectedUsers = {}; // Store connected users and their sockets
@@ -47,11 +48,12 @@ app.get("/test-db", async (req, res) => {
 
 // User Registration Endpoint
 app.post("/register", async (req, res) => {
+  console.log('Incoming registration:', req.body);
   const { username, password } = req.body;
 
   try {
     if (!username || !password) {
-      return res.status(400).send("Username and password are required");
+      return res.status(400).json({ message: 'Username and password are required' });
     }
 
     const salt = await bcrypt.genSalt(10); // Generate salt for hashing

@@ -5,7 +5,15 @@ const http = require("http");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt"); // Import bcrypt for password hashing
-const pool = require("./db"); // Import database connection
+const { Pool } = require("pg");
+const pool = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "chess_mvp",
+  password: "aatithya123",
+  port: 5432,
+});
+//const pool = require("./db"); // Import database connection
 const connectedUsers = {}; // Store connected users and their sockets
 const matchmakingQueue = []; // Queue for users waiting for matchmaking
 const activeGames = {}; // Store active games and their player associations
@@ -56,23 +64,24 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: 'Username and password are required' });
     }
 
-    const salt = await bcrypt.genSalt(10); // Generate salt for hashing
-    const hashedPassword = await bcrypt.hash(password, salt); // Hash the password
+    //const salt = await bcrypt.genSalt(10); // Generate salt for hashing
+    //const hashedPassword = await bcrypt.hash(password, salt); // Hash the password
 
     const result = await pool.query(
       "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id",
-      [username, hashedPassword]
+      [username, password] //hashedPassword]
     );
-
-    res.status(201).json({ userId: result.rows[0].id }); // Return the new user ID
+    const userId = result.rows[0].id;
+    res.status(201).json({ userId });
+    //res.status(201).json({ userId: result.rows[0].id }); // Return the new user ID
   } catch (err) {
-    console.error(err.message);
+    console.error("Database error during registration:", err.message);
 
     if (err.code === "23505") {
-      res.status(409).send("Username already exists"); // Handle unique constraint violation
+      res.status(400).send("Username already exists"); // Handle unique constraint violation
     } else {
       console.error(err);
-      res.status(500).send("Server error");
+      res.status(500).send("Internal Server error");
     }
   }
 });

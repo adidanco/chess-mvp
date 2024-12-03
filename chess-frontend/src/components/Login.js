@@ -8,17 +8,20 @@ const Login = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear any previous error
+    console.log("Sending payload:", JSON.stringify({ username, password })); // Log the request payload
     try {
-      console.log("Submitting login/register request:", { username, password });
+      
       const response = await axios.post("/register", { username, password });
-      console.log("Received response from server:", response.data);
+      console.log("Registration success:", JSON.stringify(response.data)); // Log the response
       // Pass userId to the parent component
       if (response.data?.userId) {
         onLogin(response.data.userId);
       } else {
-        setError('Invalid response from server');
+        setError('Invalidd response from server');
       } 
     } catch (err) {
+        console.error("Error occurred during registration:", JSON.stringify(err)); // Log the full error
         const errorMessage = err.response?.data?.message || "Registration failed";
         setError(errorMessage);
     }
@@ -27,7 +30,7 @@ const Login = ({ onLogin }) => {
   return (
     <div>
       <h2>Login/Register</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p style={{ color: "red" }}>{JSON.stringify(error)}</p>}
       <form onSubmit={handleSubmit}>
         <input
           type="text"

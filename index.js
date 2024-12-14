@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
   res.send("Chess MVP Backend is running!"); // Respond with a basic message
 });
 
-// Test Database Route
+// Test Database Route Get Post
 app.get("/test-db", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
